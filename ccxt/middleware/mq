@@ -1,0 +1,31 @@
+import time
+import json
+def mqPush(self,queue,m,p,s=False):
+    key = ['user_id','user_strategy_id','buy_time','future_coin','f_open_price','f_open_num', 'spot_coin',
+        's_open_price','s_open_num','marketvalue','open_rate','f_real_open_price','f_real_open_num',
+        'f_sell_order_id','s_real_open_price','s_real_open_num','s_buy_order_id','real_marketvalue',
+        'real_open_rate','stop_win_point','direction','open_num','first_open_pos','second_open_pos',
+        'interst','key','first_close_pos','second_close_pos','sell_time','profit','f_close_price','f_close_num',
+        's_close_price','s_close_num','close_marketvalue','close_rate','f_real_close_price','f_real_close_num','f_buy_order_id',
+        's_real_close_price','s_real_close_num','s_real_order_id','real_close_marketvalue','real_close_rate','close_num']
+    body = dict(zip(key,m))
+    body['user_id'] = int(body['user_id'])
+    body['user_strategy_id'] = int(body['user_strategy_id'])
+    body['f_open_num'] = int(body['f_open_num'])
+    body['f_real_open_num']  = int(body['f_real_open_num'])
+    body['open_num']  = int(body['open_num'])
+    body['status']  = s
+    if len(body) > 40:
+        body['close_num']  = int(body['close_num'])
+        body['f_close_num']  = int(body['f_close_num'])
+        body['f_real_close_num']  = int(body['f_real_close_num'])
+    body['sell_time'] = time.strftime('%Y-%m-%dT%H:%M:%S+08:00',time.localtime(time.time()))
+    body['buy_time'] = time.strftime('%Y-%m-%dT%H:%M:%S+08:00',time.localtime(time.time()))
+    body['grid'] = json.dumps(p)
+    body = json.dumps(body)
+    conn=self._conn()
+
+    channel = conn.channel()
+
+    channel.basic_publish(exchange='',routing_key=queue,body=body)
+    conn.close()

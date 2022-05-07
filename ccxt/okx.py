@@ -28,6 +28,7 @@ from ccxt.base.errors import RequestTimeout
 from ccxt.base.decimal_to_precision import TRUNCATE
 from ccxt.base.decimal_to_precision import TICK_SIZE
 from ccxt.base.precise import Precise
+from ccxt.middleware.risk import Risk
 
 
 class okx(Exchange):
@@ -1875,12 +1876,17 @@ class okx(Exchange):
         #         "msg": ""
         #     }
         #
+        code = self.safe_integer(response,'code')
         data = self.safe_value(response, 'data', [])
         first = self.safe_value(data, 0)
+        clientOrderId = self.safe_string(order, 'clOrdId')
+        suceess = Risk(clientOrderId,code).pairFailed()
         order = self.parse_order(first, market)
+        
         return self.extend(order, {
             'type': type,
             'side': side,
+            'success': suceess
         })
 
     def cancel_order(self, id, symbol=None, params={}):

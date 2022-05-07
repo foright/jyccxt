@@ -385,7 +385,7 @@ class Exchange(object):
         self.userAgent = default_user_agent()
 
         settings = self.deep_extend(self.describe(), config)
-
+        
         for key in settings:
             if hasattr(self, key) and isinstance(getattr(self, key), dict):
                 setattr(self, key, self.deep_extend(getattr(self, key), settings[key]))
@@ -2691,6 +2691,7 @@ class Exchange(object):
             timeInForce = 'PO'
         elif self.safe_string(order, 'type') == 'market':
             timeInForce = 'IOC'
+        
         return self.extend(order, {
             'lastTradeTimestamp': lastTradeTimeTimestamp,
             'price': self.parse_number(price),
